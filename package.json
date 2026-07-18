@@ -1,0 +1,40 @@
+{
+  "name": "@gyga-browser/webmcp-zalo-notify",
+  "version": "0.1.0",
+  "description": "MCP server for sending proactive Zalo Bot notifications (sendMessage/sendPhoto/sendChatAction) with saved recipient aliases. Token stays in the server env.",
+  "type": "module",
+  "bin": {
+    "webmcp-zalo-notify": "src/index.js"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "zalo",
+    "zalo-bot",
+    "notification",
+    "webmcp"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uyencss/webmcp-zalo-notify.git"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^3.23.8"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "smoke": "node test/smoke.mjs"
+  }
+}
