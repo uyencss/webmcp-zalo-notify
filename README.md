@@ -19,6 +19,21 @@ AI-chatbot runtime (webhook/polling + AI replies), see the separate
 | `list_contacts` | List saved aliases (name + chat type only — never tokens or chat_ids). |
 | `get_me` | Verify the configured token and return bot account info. |
 
+## CLI (`send`)
+
+For processes that are not MCP clients (the fleet hub outbox), the same binary
+takes a one-shot `send` subcommand — same token, same aliases, same client, so
+there is exactly one outbound path:
+
+```bash
+webmcp-zalo-notify send --recipient ops-group --text "🚨 bot-down" [--json]
+```
+
+Exit codes: `0` sent, `1` the send failed, `2` usage/missing token. With
+`--json`, stdout is `{"ok":true,"sent":true,"chat_id":…,"message_id":…}` on
+success and `{"ok":false,"error":{"code":…,"message":…}}` on failure. With no
+subcommand the binary is the MCP stdio server, exactly as before.
+
 ## Environment
 
 | Variable | Required | Description |

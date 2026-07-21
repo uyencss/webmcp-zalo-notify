@@ -133,8 +133,13 @@ server.registerTool(
   async () => run(async () => (await getClient().getMe()).result)
 );
 
-const transport = new StdioServerTransport();
-await server.connect(transport);
-process.stderr.write(
-  `[zalo-notify-mcp] ready (token: ${TOKEN ? "set" : "MISSING"}, contacts: ${Object.keys(contacts).length})\n`
-);
+if (process.argv[2] === "send") {
+  const { runSend } = await import("./send.js");
+  process.exitCode = await runSend(process.argv.slice(3));
+} else {
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+  process.stderr.write(
+    `[zalo-notify-mcp] ready (token: ${TOKEN ? "set" : "MISSING"}, contacts: ${Object.keys(contacts).length})\n`
+  );
+}
