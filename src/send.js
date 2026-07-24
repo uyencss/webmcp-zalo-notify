@@ -20,6 +20,7 @@ Env:
 
 const VALUE_OPTIONS = new Set(["recipient", "text"]);
 const BOOLEAN_OPTIONS = new Set(["json", "help"]);
+const SEND_SCHEMA = "webmcp-zalo-notify-send/1";
 
 class UsageError extends Error {}
 
@@ -46,6 +47,8 @@ export async function runSend(argv, {
   env = process.env,
   stdout = process.stdout,
   stderr = process.stderr,
+  contactsLoader = loadContacts,
+  clientFactory = (token) => new ZaloBotClient(token),
 } = {}) {
   let options;
   try {
@@ -60,8 +63,18 @@ export async function runSend(argv, {
   }
 
   const fail = (code, message, exitCode) => {
-    if (options.json) stdout.write(`${JSON.stringify({ ok: false, error: { code, message } })}\n`);
-    else stderr.write(`${code}: ${message}\n`);
+    const safeMessage = String(message)
+      .replaceAll(env.ZALO_BOT_TOKEN || "\0", "[REDACTED_TOKEN]")
+      .replaceAll(options.recipient || "\0", "[REDACTED_RECIPIENT]")
+      .slice(0, 500);
+    if (options.json) {
+      stdout.write(`${JSON.stringify({
+        ok: false,
+        schema: SEND_SCHEMA,
+        error: { code, message: safeMessage },
+      })}\n`);
+    }
+    else stderr.write(`${code}: ${safeMessage}\n`);
     return exitCode;
   };
 
@@ -73,12 +86,17 @@ export async function runSend(argv, {
   }
 
   try {
-    const chatId = resolveRecipient(options.recipient, loadContacts(env.ZALO_CONTACTS_PATH));
-    const res = await new ZaloBotClient(env.ZALO_BOT_TOKEN).sendMessage(chatId, options.text);
+    const contacts = contactsLoader(env.ZALO_CONTACTS_PATH);
+    const aliased = Object.hasOwn(contacts, options.recipient);
+    const chatId = resolveRecipient(options.recipient, contacts);
+    const res = await clientFactory(env.ZALO_BOT_TOKEN).sendMessage(chatId, options.text);
     const result = {
       ok: true,
+      schema: SEND_SCHEMA,
       sent: true,
-      chat_id: chatId,
+      recipient: aliased
+        ? { kind: "alias", alias: options.recipient }
+        : { kind: "direct" },
       message_id: res.result?.message_id ?? null,
       date: res.result?.date ?? null,
     };

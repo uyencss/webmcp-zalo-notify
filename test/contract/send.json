@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "schema": "webmcp-zalo-notify-send/1",
+  "sent": true,
+  "recipient": {
+    "kind": "alias",
+    "alias": "ops"
+  },
+  "message_id": "m-1",
+  "date": 123
+}

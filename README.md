@@ -30,9 +30,10 @@ webmcp-zalo-notify send --recipient ops-group --text "🚨 bot-down" [--json]
 ```
 
 Exit codes: `0` sent, `1` the send failed, `2` usage/missing token. With
-`--json`, stdout is `{"ok":true,"sent":true,"chat_id":…,"message_id":…}` on
-success and `{"ok":false,"error":{"code":…,"message":…}}` on failure. With no
-subcommand the binary is the MCP stdio server, exactly as before.
+`--json`, every result uses schema `webmcp-zalo-notify-send/1`. Success exposes
+only an alias/direct recipient classification and message metadata; failure
+messages redact the bot token and recipient. Raw chat IDs are never echoed.
+With no subcommand the binary is the MCP stdio server, exactly as before.
 
 ## Environment
 
